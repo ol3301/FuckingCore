@@ -8,5 +8,11 @@ namespace Common.Utilities
         {
             Console.WriteLine(message);
         }
+        
+        public static void Info(string message, Exception ex)
+        {
+            Info($"{message}:");
+            Info(ex.Message);
+        }
     }
 }
