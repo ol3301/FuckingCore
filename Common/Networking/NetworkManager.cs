@@ -3,7 +3,7 @@ using System.Net.Sockets;
 
 namespace Common.Networking
 {
-    public class NetworkManager : SocketManager<NetworkSocket>
+    public class NetworkManager : SocketManager
     {
         private readonly AsyncAcceptor _acceptor;
         
@@ -18,11 +18,17 @@ namespace Common.Networking
             _acceptor.AcceptAsync(OnSocketAccepted);
         }
 
-        protected override NetworkThread<NetworkSocket>[] CreateNetworkThreads()
+        protected void OnSocketAccepted(Socket handler)
         {
-            NetworkThread<NetworkSocket>[] threads = new NetworkThread<NetworkSocket>[ThreadsCount];
-            for (int i = 0; i < ThreadsCount; i++)
-                threads[i] = new NetworkThread<NetworkSocket>();
+            NetworkSocket socket = new NetworkSocket(handler);
+            OnSocketAcceptedBase(socket);
+        }
+
+        protected override NetworkThread[] CreateNetworkThreads()
+        {
+            NetworkThread[] threads = new NetworkThread[ThreadsCount];
+            for (int i = 0; i < ThreadsCount; i++)           
+                threads[i] = new NetworkThread();          
             return threads;
         }
     }

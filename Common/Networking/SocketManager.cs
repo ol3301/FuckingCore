@@ -4,16 +4,14 @@ using Common.Utilities.Pool;
 
 namespace Common.Networking
 {
-    public abstract class SocketManager<TSocketImplementation> 
-        where TSocketImplementation:AsyncSocket, new()
+    public abstract class SocketManager
     {
         protected int ThreadsCount { get; set; }
-        private NetworkThread<TSocketImplementation>[] _networkThreads;
-        private readonly SocketAsyncEventArgsPool _eventArgsPool;
+        private NetworkThread[] _networkThreads;
 
         public SocketManager()
         {
-            _eventArgsPool = new SocketAsyncEventArgsPool();
+            
         }
 
         protected void BaseStartNetwork(int threadsCount)
@@ -25,37 +23,20 @@ namespace Common.Networking
                 thread.Start();
         }
 
-        protected virtual void OnSocketAccepted(Socket handler)
+        protected void OnSocketAcceptedBase(NetworkSocket handler)
         {
             int threadIdx = SelectThreadWithMinConnections();
-            SocketAsyncEventArgs e = GetSocketAsyncEventArgs(handler);
-            
-            TSocketImplementation socket = new TSocketImplementation();
-            socket.Start(e);
-            
-            _networkThreads[threadIdx].AddNewSocket(e);
+            _networkThreads[threadIdx].AddNewSocketAndAllocateEventArgs(handler);
+            handler.Start();
         }
-
-        protected virtual void OnSocketRemoved(Socket handler)
-        {
-            Log.Info("OnSocketRemoved");
-        }
-        private SocketAsyncEventArgs GetSocketAsyncEventArgs(Socket handler)
-        {
-            SocketAsyncEventArgs e = _eventArgsPool.Pop();
-            e.UserToken = handler;
-            return e;
-        }
-
+        protected abstract NetworkThread[] CreateNetworkThreads();
         private int SelectThreadWithMinConnections()
         {
             int min = 0;
-            for(int i=0;i<ThreadsCount; ++i)
+            for (int i = 0; i < ThreadsCount; ++i)
                 if (_networkThreads[i].GetConnectionsCount() < _networkThreads[min].GetConnectionsCount())
                     min = i;
             return min;
         }
-
-        protected abstract NetworkThread<TSocketImplementation>[] CreateNetworkThreads();
     }
 }

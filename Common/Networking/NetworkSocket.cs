@@ -5,9 +5,15 @@ namespace Common.Networking
 {
     public class NetworkSocket : AsyncSocket
     {
-        public override void Start(SocketAsyncEventArgs eventArgs)
+        public NetworkSocket(Socket handler) : base(handler) { }
+        public override void Start()
         {
-            StartReceiveAsync(eventArgs);
+            StartReceiveAsync();
+        }
+
+        public override bool Update()
+        {
+            return !Closed;
         }
     }
 }

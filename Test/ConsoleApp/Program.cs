@@ -4,16 +4,20 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Common.Networking;
 using Common.Utilities;
+using Helper;
 
 namespace ConsoleApp
 {
     class Program
     {
+        public static Action<string> test { get; set; }
         static void Main(string[] args)
         {
             NetworkManager networkManager = new NetworkManager();
             networkManager.StartNetwork(1);
-            
+
+            Metrics.Instance().StartMonitoring();
+
             Console.ReadLine();
         }
 
