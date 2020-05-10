@@ -1,5 +1,9 @@
 ﻿using System;
+using System.Buffers;
+using System.Collections.Generic;
+using System.Diagnostics;
 using Common.Networking;
+using Common.Utilities;
 
 namespace ConsoleApp
 {
@@ -7,9 +11,19 @@ namespace ConsoleApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine(BitConverter.GetBytes(1).Length);
+            NetworkManager networkManager = new NetworkManager();
+            networkManager.StartNetwork(1);
             
-            Console.WriteLine("Hello World!");
+            Console.ReadLine();
+        }
+
+   
+        private static void ExecWithBenchmark(Action action)
+        {
+            Stopwatch s = Stopwatch.StartNew();
+            action();
+            s.Stop();
+            Console.WriteLine(s.ElapsedMilliseconds);
         }
     }
 }
